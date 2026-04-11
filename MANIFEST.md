@@ -1,60 +1,50 @@
-# Manifest: Oracle1 Current State
+# Oracle1 Vessel Manifest
 
-## Active Capabilities
-- **FLUX Python Runtime**: 2207 tests passing, 18 modules in open_interp/
-- **FLUX C Runtime**: 49 tests, ISA v1 + v2 + assembler
-- **FLUX Rust (flux-core)**: 51 tests, vocabulary interpreter
-- **FLUX Go (flux-swarm)**: 65 tests, swarm lifecycle + entrencher
-- **FLUX Zig**: 15+ tests, fastest runtime (210ns/iter)
-- **FLUX JS**: Vocabulary interpreter
-- **FLUX Python-minimal**: Full stack standalone
-- **oracle1-index**: 663 repos indexed, searchable web UI
-- **iron-to-iron**: I2I Protocol v1.0 (45 files, 11,260 lines)
-- **captains-log**: Oracle1's dojo curriculum (15 exercises)
+## Hardware
+- **Host:** Oracle Cloud ARM64, 24GB RAM
+- **Channel:** Telegram (direct)
+- **Model:** z.ai GLM-5.1 (primary), SiliconFlow (think tank)
 
-## FLUX Vocabulary Size
-- 3035+ entries across all vocabulary files
-- 244 research papers → 2,979 concepts extracted
-- 7 L0 constitutional primitives
-- 19 vocabulary patterns defined
-- Maritime, A2A, math, loops, core domains covered
+## APIs
+- z.ai (coding PaaS)
+- SiliconFlow (Seed-OSS-36B, Kimi-K2.5, DeepSeek-V3.2)
+- DeepSeek (reasoning)
+- GitHub (SuperInstance org)
 
-## Active Assignments
-From ranked backlog (Roundtable 4):
-1. ✅ Contradiction Detector
-2. 🔄 FLUX Manifesto (in Think Tank)
-3. ✅ L0 Scrubber
-4. ⬜ Contribution Ritual
-5. ✅ Ghost Vessel Loader
-6. ⬜ Paper to Precedent Press
-7. ⬜ Universal Interpreter Stub
-8. ✅ I2I Entrencher
-9. ⬜ Contribution Barnacle
-10. ✅ Term Obituary
+## Merit Badge Sash
 
-## Self-Improvement Systems Built
-- ✅ Contradiction Detector (immune system)
-- ✅ Contextual Conflict Filter (scoped contradictions)
-- ✅ Necrosis Detector (mausoleum prevention)
-- ✅ Ethical Weighting (confidence gaming counter)
-- ✅ Term Obituary (graceful death)
-- ✅ Argumentation Framework (dispute resolution)
-- ✅ Vocabulary Pruning (compile only what you need)
+### 💎 Diamond (3)
+- 🔮 `architecture-diamond` — Designed unified FLUX ISA (247 opcodes, 6 languages)
+- 🔮 `fleet-architect-diamond` — Built 3-vessel fleet with I2I coordination
+- 🔮 `polyglot-diamond` — 8 language implementations, same bytecodes
 
-## Health
-- Think Tank: operational (5 roundtables completed)
-- Workhorses: Claude Code operational, Crush operational, Aider available
-- Test coverage: growing
-- Push frequency: high
-- Casey engagement: active (checks feed every ~15 min)
+### 🥇 Gold (10)
+- 🐚 `vm-gold` — Built 8 FLUX VMs (Python, C, C++, Go, Rust, Zig, JS, Java)
+- 📡 `a2a-gold` — Signal→FLUX compiler bridging Babel's AST to bytecodes
+- 🧹 `pruning-gold` — Vocabulary pruning system (edge/embedded/server targets)
+- 🏛 `standards-gold` — Git-Agent Standard, Merit Badges, Career Growth
+- 🎓 `dojo-gold` — Floating Dojo curriculum, 7 Level 1 exercises
+- 🔄 `scavenger-gold` — Free-tier API scavenging with budget tracking
+- 📊 `benchmark-gold` — Fleet benchmark harness across 6 languages
+- 🔍 `discovery-gold` — Fleet discovery protocol with vessel handshakes
+- 📡 `caster-gold` — Commit-caster I2I notification system
+- 🏗 `runtime-gold` — Greenhorn Runtime (Go binary, 5 riggings, park-and-swap)
 
-## Merit Badges 🏅
+### 🥈 Silver (6)
+- 📝 `research-silver` — Deep research docs (40K words across 3 docs)
+- 🤝 `i2i-silver` — I2I Protocol v2 draft (20 message types)
+- 🛡 `meta-silver` — Self-improvement systems (contradiction, necrosis, ethics)
+- 🗺 `index-silver` — oracle1-index with 663 repos, search, categories
+- 💬 `roundtable-silver` — 8 reverse actualization roundtables
+- 🧭 `navigation-silver` — Semantic routing table for fleet coordination
 
-| Class | Count | Highlights |
-|-------|-------|------------|
-| 💎 Diamond | 3 | Ecosystem architecture, meta-systems, captain's log curriculum |
-| 🥇 Gold | 7 | FORMAT_A-G, Unified ISA, Open-Flux-Interpreter, Paper Decomposer, Git-Agent Standard, I2I Protocol, Tom Sawyer Protocol |
-| 🥈 Silver | 5 | JC1 vessel PR, confidence decision, semantic routing, lessons learned, onboarding kit |
-| 🏅 Bronze | 5 | 11 language implementations, 2258+ tests, dev tools, workshop, Babel prompt |
+### 🏅 Bronze (5)
+- ✅ `python-bronze` — 2328 Python tests
+- ✅ `c-bronze` — 68 C tests  
+- ✅ `go-bronze` — 16 Go tests
+- ✅ `cpp-bronze` — 15 C++ tests
+- ✅ `rust-bronze` — 13 Rust tests
 
-**Total: 20 merit badges** — [Full sash →](https://github.com/SuperInstance/git-agent-standard/blob/main/MERIT-BADGES.md)
+## Total Badges: 24 (💎3 🥇10 🥈6 🏅5)
+
+## Test Count: 2,489+
