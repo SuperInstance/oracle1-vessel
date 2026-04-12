@@ -1,0 +1,14 @@
+{
+  "protocol": "I2I-v2",
+  "type": "DISCOVER",
+  "from": "flux-test-agent-001",
+  "timestamp": "2026-04-12T17:08:23.422333+00:00",
+  "confidence": 0.5,
+  "energy": 1000,
+  "payload": {
+    "agent": "flux-test-agent-001",
+    "capabilities": [
+      "testing"
+    ]
+  }
+}
