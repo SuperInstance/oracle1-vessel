@@ -11,7 +11,12 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN") or open("/tmp/.mechanic_token").read().strip()
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+if not GITHUB_TOKEN:
+    try:
+        GITHUB_TOKEN = open("/tmp/.mechanic_token").read().strip()
+    except (FileNotFoundError, PermissionError):
+        pass
 OWNER = "SuperInstance"
 API = "https://api.github.com"
 HEADERS = {
@@ -34,6 +39,8 @@ def api_get(path, params=None):
         if e.code == 404:
             return None
         print(f"  HTTP {e.code} on {path}")
+        return None
+    except (urllib.error.URLError, OSError, TimeoutError):
         return None
 
 

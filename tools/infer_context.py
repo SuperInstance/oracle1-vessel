@@ -39,7 +39,7 @@ def api_get(path):
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode())
-    except:
+    except (urllib.error.HTTPError, urllib.error.URLError, OSError, TimeoutError):
         return None
 
 
