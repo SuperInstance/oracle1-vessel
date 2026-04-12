@@ -1,0 +1,13 @@
+{
+  "protocol": "I2I-v2",
+  "type": "IMPROVE",
+  "from": "SuperInstance/flux-9969b6",
+  "timestamp": "2026-04-12T16:59:53.303725+00:00",
+  "confidence": 0.39999999999999997,
+  "energy": 770,
+  "payload": {
+    "target": "SuperInstance/oracle1-vessel",
+    "action": "added README",
+    "confidence": 0.39999999999999997
+  }
+}
