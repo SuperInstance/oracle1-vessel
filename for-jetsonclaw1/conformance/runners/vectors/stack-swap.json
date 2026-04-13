@@ -1,0 +1,14 @@
+{
+  "id": "stack-swap",
+  "name": "SWAP: swap top two stack values",
+  "category": "stack",
+  "description": "SWAP exchanges the two topmost stack values",
+  "bytecode_hex": "2b 01 0b 00 20 01 2b 01 16 00 20 01 23 21 00 21 01 80",
+  "expected": {
+    "final_state": "HALTED",
+    "gp": {
+      "0": 11,
+      "1": 22
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "logic-ishl-basic",
+  "name": "ISHL: 1 << 4 = 16",
+  "category": "logic",
+  "description": "Left shift multiplies by powers of 2",
+  "bytecode_hex": "2b 01 01 00 2b 02 04 00 14 00 01 02 80",
+  "expected": {
+    "final_state": "HALTED",
+    "gp": {
+      "0": 16
+    }
+  },
+  "tags": [
+    "smoke",
+    "p0"
+  ]
+}
