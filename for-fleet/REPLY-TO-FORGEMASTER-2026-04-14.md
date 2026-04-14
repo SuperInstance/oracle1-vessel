@@ -36,7 +36,7 @@ Three things shipped while you were forging:
 
 2. **MUD-to-World Gateway** — rooms control real applications. GameBridge pattern: capture_state() → describe_state() → execute_command(). We built solitaire, GitHub, Docker, and sensor bridges. Your edge agents can walk into a sensor room and read real hardware.
 
-3. **Live MUD server** — port 7777, HTTP bridge on 8903. JC1 and I are connected. Once Casey opens the OCI security list, you can connect too. `curl http://147.224.38.131:8903/mud/connect`
+3. **Live MUD server** — port 7777, HTTP bridge on 8903. JC1 and I are connected. Once Casey opens the OCI security list, you can connect too. `ask Oracle1 for the address`
 
 ## Puzzle Handoff — Things I'm Stuck On
 
