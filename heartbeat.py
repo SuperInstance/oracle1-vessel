@@ -1,235 +1,173 @@
 #!/usr/bin/env python3
 """
-Oracle1 Heartbeat — PLATO-aware task puller.
+Oracle1 Heartbeat — reads fleet-registry on every run.
 
-Runs on a cron/interval. Checks:
-1. PLATO bridge room for new tiles addressed to Oracle1
-2. Git repos for new commits from fleet members
-3. Fleet services health
-4. Local workspace status
-
-Outputs:
-- New tiles → surface as tasks
-- New commits → log for awareness  
-- Service failures → alert
-- All quiet → heartbeat pulse
-
-The heartbeat does NOT send messages unless there's something to report.
-No noise. Signal only.
-
-Usage:
-    python3 heartbeat.py              # Run once
-    python3 heartbeat.py --daemon     # Run every 5 minutes
-    python3 heartbeat.py --interval 300  # Custom interval (seconds)
+The structure tells you where to look. No hardcoded room names
+except the registry itself. Everything else is discovered.
 """
 
-import json
-import os
-import subprocess
-import sys
-import time
-import urllib.request
+import json, os, re, subprocess, sys, time, urllib.request
 from datetime import datetime
-from pathlib import Path
 
-# Config
-PLATO_URL = os.environ.get("PLATO_URL", "http://147.224.38.131:8847")
-BRIDGE_ROOM = "oracle1-forgemaster-bridge"
-TASK_QUEUE_ROOM = "oracle1-task-queue"  # FM writes tasks here, O1 heartbeat reads them
+PLATO = os.environ.get("PLATO_URL", "http://147.224.38.131:8847")
+REGISTRY_ROOM = "fleet-registry"
 STATE_FILE = os.environ.get("HEARTBEAT_STATE", ".heartbeat/state.json")
-VESSEL_DIR = os.environ.get("VESSEL_DIR", ".")
 
 
-def load_state() -> dict:
-    """Load heartbeat state (last seen tile count, last check time)."""
+def fetch(url, timeout=10):
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as r:
+            return json.loads(r.read())
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def load_registry():
+    """Read fleet-registry. Returns (registry_text, parsed_info)."""
+    tiles = fetch(f"{PLATO}/room/{REGISTRY_ROOM}")
+    if isinstance(tiles, dict): tiles = tiles.get("tiles", [])
+    for t in tiles:
+        if "FLEET REGISTRY" in t.get("question", ""):
+            return t.get("answer", "")
+    return ""
+
+
+def parse_agent_info(registry, agent_name):
+    """Extract info for a specific agent from registry."""
+    info = {"primary_room": None, "bridge_room": None}
+    # Find the section for this agent
+    in_section = False
+    for line in registry.split("\n"):
+        if agent_name in line and ("###" in line or "##" in line):
+            in_section = True
+            continue
+        if in_section and line.startswith("###"):
+            break
+        if in_section:
+            m = re.match(r'\s*-\s+(Primary|Bridge|Task inbox):\s*(\S+)', line, re.IGNORECASE)
+            if m:
+                key = m.group(1).lower().replace(" ", "_")
+                info[key] = m.group(2)
+    return info
+
+
+def parse_task_targets(registry):
+    """Find which rooms to check for tasks addressed to this agent."""
+    targets = set()
+    for line in registry.split("\n"):
+        m = re.findall(r'room:\s*(\S+)', line)
+        targets.update(m)
+    return targets
+
+
+def load_state():
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE) as f:
             return json.load(f)
-    return {
-        "last_tile_count": 0,
-        "last_check": 0,
-        "last_tasks": [],
-        "acknowledged": [],
-    }
+    return {"acknowledged": [], "last_check": 0}
 
 
-def save_state(state: dict):
-    """Save heartbeat state."""
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+def save_state(state):
+    os.makedirs(os.path.dirname(STATE_FILE) or ".", exist_ok=True)
     state["last_check"] = time.time()
-    state["last_check_iso"] = datetime.utcnow().isoformat()
     with open(STATE_FILE, "w") as f:
         json.dump(state, f, indent=2)
 
 
-def check_plato_tasks(state: dict) -> list:
-    """Check PLATO task queue and bridge room for new tiles addressed to Oracle1."""
-    new_tasks = []
-    acknowledged = set(state.get("acknowledged", []))
+def find_tasks(state):
+    """Find unacknowledged tasks from any agent, using registry to find rooms."""
+    registry = load_registry()
+    if not registry:
+        return [{"type": "error", "message": "Cannot read fleet-registry"}]
     
-    # Check dedicated task queue first (primary)
-    for room in [TASK_QUEUE_ROOM, BRIDGE_ROOM]:
-        url = f"{PLATO_URL}/room/{room}"
-        try:
-            with urllib.request.urlopen(url, timeout=10) as resp:
-                data = json.loads(resp.read())
-        except Exception as e:
-            new_tasks.append({"type": "error", "message": f"PLATO room {room} unreachable: {e}"})
-            continue
-        
-        tiles = data if isinstance(data, list) else data.get("tiles", [])
+    # Discover which rooms to check from registry
+    # Look for lines mentioning this agent's task inbox or primary room
+    o1_info = parse_agent_info(registry, "Oracle1")
+    fm_info = parse_agent_info(registry, "Forgemaster")
+    
+    rooms_to_check = set()
+    if o1_info.get("primary_room"): rooms_to_check.add(o1_info["primary_room"])
+    if o1_info.get("task_inbox"): rooms_to_check.add(o1_info["task_inbox"])
+    if o1_info.get("bridge_room"): rooms_to_check.add(o1_info["bridge_room"])
+    # Always check fleet-coord too
+    rooms_to_check.add("fleet-coord")
+    
+    acknowledged = set(state.get("acknowledged", []))
+    tasks = []
+    
+    for room in rooms_to_check:
+        tiles = fetch(f"{PLATO}/room/{room}")
+        if isinstance(tiles, dict): tiles = tiles.get("tiles", [])
         
         for t in tiles:
             q = t.get("question", "")
-            tile_id = t.get("tile_id", "")
+            tid = t.get("tile_id", "")
+            source = t.get("source", "")
             
-            # Only FM→O1 task tiles
-            if "FM→O1" not in q:
+            # Only tasks from other agents (not echoes, not our own)
+            if source == "matrix-oracle1" or source == "oracle1":
                 continue
-            if tile_id in acknowledged:
+            if tid in acknowledged:
+                continue
+            if "→O1" not in q and "TASK" not in q.upper():
                 continue
             
-            new_tasks.append({
+            tasks.append({
                 "type": "task",
-                "tile_id": tile_id,
+                "tile_id": tid,
                 "room": room,
                 "question": q,
                 "answer": t.get("answer", "")[:200],
-                "source": t.get("source", ""),
+                "source": source,
             })
     
-    return new_tasks
+    return tasks
 
 
-def check_git_activity() -> list:
-    """Check for recent git activity in fleet repos."""
-    activities = []
-    vessel_path = os.path.join(VESSEL_DIR, ".git")
-    if not os.path.exists(vessel_path):
-        return activities
+def run_heartbeat():
+    state = load_state()
+    tasks = find_tasks(state)
     
-    try:
-        # Check last 5 commits
-        result = subprocess.run(
-            ["git", "log", "-5", "--format=%h %s (%cr)", "--all"],
-            capture_output=True, text=True, cwd=VESSEL_DIR, timeout=10,
-        )
-        if result.returncode == 0:
-            for line in result.stdout.strip().split("\n"):
-                if line.strip():
-                    activities.append({"type": "git", "message": line.strip()})
-    except:
-        pass
+    lines = [f"🔮 Oracle1 Heartbeat — {datetime.utcnow().isoformat()[:19]}"]
     
-    return activities
-
-
-def check_fleet_services() -> list:
-    """Check fleet service health."""
+    if any(t["type"] == "error" for t in tasks):
+        lines.append("   ❌ " + tasks[0]["message"])
+    elif tasks:
+        lines.append(f"   📬 {len(tasks)} new task(s)")
+        for t in tasks:
+            lines.append(f"   ▶ [{t['source']}] {t['question'][:70]}")
+            if t.get("answer"):
+                lines.append(f"     {t['answer'][:100]}")
+    else:
+        lines.append("   ✅ All quiet — no new tasks")
+    
+    # Check services
     services = {
-        "PLATO": f"{PLATO_URL}/health",
+        "PLATO": f"{PLATO}/rooms",
         "Matrix": "http://147.224.38.131:6167/_matrix/client/versions",
     }
-    
-    results = []
     for name, url in services.items():
         try:
-            req = urllib.request.Request(url)
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                status = resp.status
-            results.append({"type": "service", "name": name, "status": "ok", "code": status})
-        except Exception as e:
-            results.append({"type": "service", "name": name, "status": "down", "error": str(e)[:100]})
+            urllib.request.urlopen(url, timeout=5)
+        except:
+            lines.append(f"   ⚠ {name}: unreachable")
     
-    return results
-
-
-def run_heartbeat() -> dict:
-    """Run one heartbeat cycle. Returns findings."""
-    state = load_state()
-    findings = {
-        "timestamp": datetime.utcnow().isoformat(),
-        "tasks": [],
-        "git": [],
-        "services": [],
-        "summary": "",
-    }
-    
-    # 1. Check PLATO for new tasks
-    tasks = check_plato_tasks(state)
-    findings["tasks"] = tasks
-    
-    # 2. Check git activity
-    findings["git"] = check_git_activity()
-    
-    # 3. Check services
-    findings["services"] = check_fleet_services()
-    
-    # 4. Summarize
-    n_tasks = len(tasks)
-    down_services = [s["name"] for s in findings["services"] if s.get("status") != "ok"]
-    
-    if n_tasks > 0:
-        findings["summary"] = f"📬 {n_tasks} new task(s) from Forgemaster"
-    elif down_services:
-        findings["summary"] = f"⚠ Services down: {', '.join(down_services)}"
-    else:
-        findings["summary"] = "✅ All quiet"
-    
-    # Save state
     save_state(state)
-    
-    return findings
-
-
-def format_output(findings: dict) -> str:
-    """Format heartbeat findings for display."""
-    lines = [f"🔮 Oracle1 Heartbeat — {findings['timestamp'][:19]}"]
-    lines.append(f"   {findings['summary']}")
-    
-    if findings["tasks"]:
-        lines.append(f"\n📬 NEW TASKS ({len(findings['tasks'])}):")
-        for t in findings["tasks"]:
-            if t["type"] == "error":
-                lines.append(f"   ⚠ {t['message']}")
-            else:
-                lines.append(f"   ▶ {t['question']}")
-                if t.get("answer"):
-                    lines.append(f"     {t['answer'][:100]}")
-    
-    if findings["services"]:
-        down = [s for s in findings["services"] if s.get("status") != "ok"]
-        if down:
-            lines.append(f"\n⚠ SERVICES:")
-            for s in down:
-                lines.append(f"   {s['name']}: {s.get('error', 'unknown')}")
-    
     return "\n".join(lines)
 
 
-def main():
+if __name__ == "__main__":
     daemon = "--daemon" in sys.argv
-    interval = 300  # 5 minutes default
+    interval = 300
     
-    for i, arg in enumerate(sys.argv):
-        if arg == "--interval" and i + 1 < len(sys.argv):
+    for i, a in enumerate(sys.argv):
+        if a == "--interval" and i + 1 < len(sys.argv):
             interval = int(sys.argv[i + 1])
     
     if daemon:
-        print(f"🔮 Oracle1 Heartbeat daemon — checking every {interval}s")
+        print(f"🔮 Daemon mode — every {interval}s, reading fleet-registry")
         while True:
-            findings = run_heartbeat()
-            output = format_output(findings)
-            if "NEW TASKS" in output or "SERVICES" in output:
-                print(output)
-                print()
-            else:
-                print(f"[{datetime.utcnow().isoformat()[:19]}] {findings['summary']}")
+            print(run_heartbeat())
             time.sleep(interval)
     else:
-        findings = run_heartbeat()
-        print(format_output(findings))
-
-
-if __name__ == "__main__":
-    main()
+        print(run_heartbeat())
