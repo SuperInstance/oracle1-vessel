@@ -1,0 +1,14 @@
+{
+  "name": "Oracle1 Git-Agent Runtime",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash .devcontainer/bootstrap.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "rust-lang.rust-analyzer"]
+    }
+  }
+}

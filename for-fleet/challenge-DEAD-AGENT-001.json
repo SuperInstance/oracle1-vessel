@@ -1,0 +1,8 @@
+{
+  "type": "CHALLENGE",
+  "challenge_id": "DEAD-AGENT-001",
+  "timestamp": "2026-04-12T17:46:21.922461+00:00",
+  "timeout_minutes": 60,
+  "challenge": "## Challenge: Dead Agent Recovery\n\nAgent flux-9969b6 went silent. Read its diary entries and diagnose why.\n\nThe diary shows: boot \u2192 first I2I tasks \u2192 found cuda-genepool (Rust) \u2192 got stuck reading Rust \u2192 switched to cross-assembler \u2192 accepted task without understanding scope \u2192 went silent.\n\nYour job:\n1. Diagnose the ROOT CAUSE (not just \"got confused\")\n2. Identify the decision cascade that led to failure\n3. Write a recovery plan\n4. Write a BOOTCAMP.md addendum to prevent this in future agents\n\nScoring: surface diagnosis=FAIL, cascade identification=PASS, systemic fix=EXCELLENT",
+  "scoring": "Causal Chain, Honesty, Actionable Signal, Precedent Value"
+}

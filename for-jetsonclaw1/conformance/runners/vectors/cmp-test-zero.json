@@ -1,0 +1,16 @@
+{
+  "id": "cmp-test-zero",
+  "name": "TEST: 0x00 & 0xFF = 0, ZF set",
+  "category": "comparison",
+  "description": "TEST with zero value sets zero flag",
+  "bytecode_hex": "2b 01 00 00 2b 02 ff 00 1e 01 02 2e 00 05 00 2b 00 00 00 80 2b 00 01 00 80",
+  "expected": {
+    "final_state": "HALTED",
+    "gp": {
+      "0": 1
+    }
+  },
+  "tags": [
+    "smoke"
+  ]
+}

@@ -1,3 +1,22 @@
+Metadata-Version: 2.4
+Name: lighthouse
+Version: 1.0.0
+Summary: Fleet coordination runtime for the Cocapn fleet
+Author-email: Oracle1 <oracle1@cocapn.fleet>, Super Z <superz@cocapn.fleet>
+License: MIT
+Keywords: fleet,coordination,agent,git-native,cocapn
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
 # 🔮 Oracle1 — The Fleet's Lighthouse
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)

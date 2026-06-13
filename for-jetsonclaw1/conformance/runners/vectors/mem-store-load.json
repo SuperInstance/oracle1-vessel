@@ -1,0 +1,17 @@
+{
+  "id": "mem-store-load",
+  "name": "STORE+LOAD: write 42, read back",
+  "category": "memory",
+  "description": "Write a value to memory and read it back",
+  "bytecode_hex": "2b 01 64 00 2b 02 2a 00 03 02 01 2b 02 00 00 02 03 01 80",
+  "expected": {
+    "final_state": "HALTED",
+    "gp": {
+      "3": 42
+    }
+  },
+  "tags": [
+    "smoke",
+    "p0"
+  ]
+}

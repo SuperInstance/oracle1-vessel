@@ -1,0 +1,16 @@
+{
+  "protocol": "I2I-v2",
+  "type": "VESSEL_LAUNCHED",
+  "from": "flux-chronometer",
+  "timestamp": "2026-04-12T18:53:10.259317+00:00",
+  "confidence": 0.35,
+  "energy": 700,
+  "payload": {
+    "vessel": "flux-chronometer",
+    "type": "vessel",
+    "field": "testing and conformance",
+    "academy_graduate": false,
+    "confidence": 0.35,
+    "born_at": "2026-04-12T18:51:44.788370+00:00"
+  }
+}

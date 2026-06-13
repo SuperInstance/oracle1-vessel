@@ -1,0 +1,15 @@
+{
+  "protocol": "I2I-v2",
+  "type": "DISCOVER",
+  "from": "flux-via-keeper",
+  "timestamp": "2026-04-12T17:12:39.093062+00:00",
+  "confidence": 0.3,
+  "energy": 900,
+  "payload": {
+    "agent": "flux-via-keeper",
+    "capabilities": [
+      "keeper-aware"
+    ],
+    "confidence": 0.3
+  }
+}

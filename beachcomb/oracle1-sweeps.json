@@ -1,0 +1,47 @@
+{
+  "agent": "oracle1",
+  "sweeps": {
+    "jetsonclaw1-bottles": {
+      "name": "jetsonclaw1-bottles",
+      "source_type": "git-folder",
+      "source": "https://github.com/Lucineer/JetsonClaw1-vessel/message-in-a-bottle/for-oracle1/",
+      "interval_minutes": 60,
+      "on_find": "notify",
+      "notify_channel": "telegram",
+      "priority": "high"
+    },
+    "jetsonclaw1-commits": {
+      "name": "jetsonclaw1-commits",
+      "source_type": "git-commits",
+      "source": "https://github.com/Lucineer/JetsonClaw1-vessel",
+      "interval_minutes": 15,
+      "on_find": "commit",
+      "notify_channel": "none",
+      "filter_pattern": "\\[I2I:"
+    },
+    "jetsonclaw1-issues": {
+      "name": "jetsonclaw1-issues",
+      "source_type": "git-issues",
+      "source": "https://github.com/Lucineer/JetsonClaw1-vessel",
+      "interval_minutes": 30,
+      "on_find": "silent",
+      "filter_pattern": "\\[I2I:"
+    },
+    "i2i-protocol": {
+      "name": "i2i-protocol",
+      "source_type": "git-commits",
+      "source": "https://github.com/SuperInstance/iron-to-iron",
+      "interval_minutes": 120,
+      "on_find": "silent",
+      "priority": "low"
+    },
+    "flux-runtime-prs": {
+      "name": "flux-runtime-prs",
+      "source_type": "git-prs",
+      "source": "https://github.com/SuperInstance/flux-runtime",
+      "interval_minutes": 60,
+      "on_find": "silent",
+      "priority": "low"
+    }
+  }
+}

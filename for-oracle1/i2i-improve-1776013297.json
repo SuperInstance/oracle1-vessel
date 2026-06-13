@@ -1,0 +1,13 @@
+{
+  "protocol": "I2I-v2",
+  "type": "IMPROVE",
+  "from": "SuperInstance/flux-0c476c",
+  "timestamp": "2026-04-12T17:01:37.954739+00:00",
+  "confidence": 0.35,
+  "energy": 950,
+  "payload": {
+    "target": "SuperInstance/flux-0c476c",
+    "action": "added README",
+    "confidence": 0.35
+  }
+}
